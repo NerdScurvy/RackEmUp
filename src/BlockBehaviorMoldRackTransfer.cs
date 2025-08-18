@@ -23,6 +23,16 @@ namespace CarryOn.MoldRackTransfer
         {
         }
 
+        // Could implement a per-slot index delay
+        private float? TransferDelay { get; set; }
+
+        public override void Initialize(JsonObject properties)
+        {
+            base.Initialize(properties);
+             if (TryGetFloat(properties, "transferDelay", out var t)) TransferDelay = t;
+
+        }
+
         public bool IsTransferEnabled(ICoreAPI api)
         {
             return true;
@@ -51,10 +61,11 @@ namespace CarryOn.MoldRackTransfer
         ///         CarryOn can be directed to stop all further interactions if failureCode is set to "__stop__". 
         ///         Otherwise will continue checking CarryOn interactions.
         /// </returns>
-        public bool CanPutCarryable(IPlayer player, BlockEntity blockEntity, int index, ItemStack itemStack, TreeAttribute blockEntityData, out string failureCode, out string onScreenErrorMessage)
+        public bool CanPutCarryable(IPlayer player, BlockEntity blockEntity, int index, ItemStack itemStack, ITreeAttribute blockEntityData, out float? transferDelay, out string failureCode, out string onScreenErrorMessage)
         {
             failureCode = null;
             onScreenErrorMessage = null;
+            transferDelay = TransferDelay;
 
             var moldRack = blockEntity as BlockEntityMoldRack;
             if (moldRack == null || index < 0 || index >= moldRack.Inventory.Count)
@@ -120,10 +131,11 @@ namespace CarryOn.MoldRackTransfer
         ///         CarryOn can be directed to stop all further interactions if failureCode is set to "__stop__". 
         ///         Otherwise will continue checking CarryOn interactions.
         /// </returns>
-        public bool CanTakeCarryable(IPlayer player, BlockEntity blockEntity, int index, out string failureCode, out string onScreenErrorMessage)
+        public bool CanTakeCarryable(IPlayer player, BlockEntity blockEntity, int index, out float? transferDelay, out string failureCode, out string onScreenErrorMessage)
         {
             failureCode = null;
             onScreenErrorMessage = null;
+            transferDelay = TransferDelay;
 
             // Ensure correct type
             var moldRack = blockEntity as BlockEntityMoldRack;
@@ -165,10 +177,10 @@ namespace CarryOn.MoldRackTransfer
         /// <param name="failureCode"></param>
         /// <param name="onScreenErrorMessage"></param>
         /// <returns></returns>
-        public bool TryPutCarryable(IPlayer player, BlockEntity blockEntity, int index, ItemStack itemstack, TreeAttribute blockEntityData, out string failureCode, out string onScreenErrorMessage)
+        public bool TryPutCarryable(IPlayer player, BlockEntity blockEntity, int index, ItemStack itemstack, ITreeAttribute blockEntityData, out string failureCode, out string onScreenErrorMessage)
         {
 
-            if (!CanPutCarryable(player, blockEntity, index, itemstack, blockEntityData, out failureCode, out onScreenErrorMessage))
+            if (!CanPutCarryable(player, blockEntity, index, itemstack, blockEntityData, out _, out failureCode, out onScreenErrorMessage))
             {
                 return false;
             }
@@ -206,12 +218,12 @@ namespace CarryOn.MoldRackTransfer
         /// <param name="failureCode"></param>
         /// <param name="onScreenErrorMessage"></param>
         /// <returns></returns>
-        public bool TryTakeCarryable(IPlayer player, BlockEntity blockEntity, int index, out ItemStack itemstack, out TreeAttribute blockEntityData, out string failureCode, out string onScreenErrorMessage)
+        public bool TryTakeCarryable(IPlayer player, BlockEntity blockEntity, int index, out ItemStack itemstack, out ITreeAttribute blockEntityData, out string failureCode, out string onScreenErrorMessage)
         {
             itemstack = null;
             blockEntityData = null;
 
-            if (!CanTakeCarryable(player, blockEntity, index, out failureCode, out onScreenErrorMessage))
+            if (!CanTakeCarryable(player, blockEntity, index, out _,out failureCode, out onScreenErrorMessage))
             {
                 return false;
             }
@@ -247,7 +259,7 @@ namespace CarryOn.MoldRackTransfer
         /// <summary>
         /// Determines whether the block can be carried by the player.
         /// </summary>
-        public bool BlockCarryAllowed(IPlayer player, BlockSelection selection)
+        public bool IsBlockCarryAllowed(IPlayer player, BlockSelection selection)
         {
 
             var moldRack = GetMoldRackBlockEntity(player.Entity.Api.World, selection.Position);
@@ -283,7 +295,7 @@ namespace CarryOn.MoldRackTransfer
 
         private bool IsItemSlotEmpty()
         {
-return  false;
+            return false;
         }
 
 
@@ -292,7 +304,7 @@ return  false;
             return block?.BlockBehaviors?.Any(b => b.GetType().Name == behaviorClassName) ?? false;
         }
 
-        
+
 
         public override WorldInteraction[] GetPlacedBlockInteractionHelp(
                     IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, ref EnumHandling handled)
@@ -333,5 +345,17 @@ return  false;
 
             return interactions;
         }
+        
+        private bool TryGetFloat(JsonObject json, string key, out float result)
+        {
+            if (!json.KeyExists(key))
+            {
+                result = float.NaN;
+                return false;
+            }
+            result = json[key].AsFloat(float.NaN);
+            return !float.IsNaN(result);
+        }
+
     }
 }
