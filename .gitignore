@@ -1,0 +1,9 @@
+/bin/
+/obj/
+/build/
+/.idea/
+.vs/CarryOn/DesignTimeBuild/.dtbcache.v2
+.vs/CarryOn/v17/.futdcache.v2
+.vs/CarryOn/v17/.suo
+/node_modules
+/release

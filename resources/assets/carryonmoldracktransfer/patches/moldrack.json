@@ -1,0 +1,47 @@
+[
+  {
+    "file": "game:blocktypes/wood/moldrack",
+    "side": "Server",
+    "op": "addmerge",
+    "path": "/behaviors/-",
+    "value": {
+      "name": "Carryable",
+      "properties": {
+        "patchPriority": 1,
+        "TransferHandler": "MoldRackTransfer",
+        "translation": [
+          0.0625,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          180,
+          0
+        ]
+
+      }
+    },
+    "condition": {
+      "when": "carryon:MoldRackEnabled",
+      "isValue": "true"
+    }
+  },
+  {
+    "file": "game:blocktypes/wood/moldrack",
+    "side": "Server",
+    "op": "add",
+    "path": "/behaviors/-",
+    "value": {
+      "name": "MoldRackTransfer",
+      "properties": {
+       
+      }
+    },
+    "condition": {
+      "when": "carryon:MoldRackTransferEnabled",
+      "isValue": "true"
+    }
+  }  
+]
+
