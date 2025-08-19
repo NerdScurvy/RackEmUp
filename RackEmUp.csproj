@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		
-		<AssemblyTitle>CarryOnMoldRackTransfer</AssemblyTitle>
+		<AssemblyTitle>RackEmUp</AssemblyTitle>
 		<Authors>NerdScurvy</Authors>
 		<Version>0.1.0-pre.1</Version>
 		
 		<Description>CarryOn extenstion to allow carried molds to be put or taken from the mold rack</Description>
-		<RepositoryUrl>https://github.com/NerdScurvy/CarryOnMoldRackTransfer</RepositoryUrl>
+		<RepositoryUrl>https://github.com/NerdScurvy/RackEmUp</RepositoryUrl>
 		
 		<TargetFramework>net8.0</TargetFramework>
 		<LangVersion>latest</LangVersion>

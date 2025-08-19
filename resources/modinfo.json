@@ -1,14 +1,14 @@
 {
 	"type": "code",
-	"name": "Carry On Mold Rack Transfer",
-	"modid": "carryonmoldracktransfer",
-	"version": "0.1.0-pre.1",
+	"name": "Carry On RackEmUp",
+	"modid": "rackemup",
+	"version": "1.0.0",
 
 	"description": "Allows for the transfer of items to and from mold racks.",
-	"website": "https://github.com/NerdScurvy/CarryOnMoldRackTransfer",
+	"website": "https://github.com/NerdScurvy/RackEmUp",
 	"authors": [ "NerdScurvy" ],
 
 	"dependencies": {
-		"game": "1.21.0-rc.4"
+		"game": "1.21.0-rc.6"
 	}
 }

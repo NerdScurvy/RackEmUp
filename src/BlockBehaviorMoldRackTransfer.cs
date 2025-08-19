@@ -7,7 +7,7 @@ using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.GameContent;
 
-namespace CarryOn.MoldRackTransfer
+namespace CarryOn.RackEmUp
 {
     public class BlockBehaviorMoldRackTransfer : BlockBehavior, ICarryableTransfer
     {
@@ -23,6 +23,8 @@ namespace CarryOn.MoldRackTransfer
         {
         }
 
+        public CarryOnLib.Core CarryOnLib { get; set; }
+
         // Could implement a per-slot index delay
         private float? TransferDelay { get; set; }
 
@@ -31,6 +33,13 @@ namespace CarryOn.MoldRackTransfer
             base.Initialize(properties);
              if (TryGetFloat(properties, "transferDelay", out var t)) TransferDelay = t;
 
+        }
+
+        public override void OnLoaded(ICoreAPI api)
+        {
+            CarryOnLib = api.ModLoader.GetModSystem<CarryOnLib.Core>();
+
+            base.OnLoaded(api);
         }
 
         public bool IsTransferEnabled(ICoreAPI api)
@@ -293,12 +302,6 @@ namespace CarryOn.MoldRackTransfer
             return moldRack.Inventory[selectionBoxIndex];
         }
 
-        private bool IsItemSlotEmpty()
-        {
-            return false;
-        }
-
-
         private bool HasBehavior(Block block, string behaviorClassName)
         {
             return block?.BlockBehaviors?.Any(b => b.GetType().Name == behaviorClassName) ?? false;
@@ -310,8 +313,8 @@ namespace CarryOn.MoldRackTransfer
                     IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, ref EnumHandling handled)
         {
 
-            var carried = forPlayer.Entity.WatchedAttributes.GetTreeAttribute("carryon:Carried");
-            var hands = carried?.GetTreeAttribute("Hands");
+            // TODO: Implement CarryOnLib API to this info
+            var carriedInHands = CarryOnLib?.CarryManager?.GetCarriedBlock(forPlayer, CarrySlot.Hands);
 
             var moldRack = GetMoldRackBlockEntity(world, selection.Position);
             var slot = GetSlotFromMoldRack(moldRack, selection.SelectionBoxIndex);
@@ -321,27 +324,34 @@ namespace CarryOn.MoldRackTransfer
                 return null; // Not a mold rack or invalid selection
             }
 
+            WorldInteraction[] interactions = null;
+
             if (slot.Empty)
             {
-                // Slot is empty, allow putting items into it
-                return new WorldInteraction[] {
+                if (carriedInHands != null)
+                {
+                    // Slot is empty, allow putting items into it
+                    return [
+                        new WorldInteraction {
+                            ActionLangCode  = "carryon:blockhelp-put",
+                            HotKeyCode      = "carryonputkey",
+                            MouseButton     = EnumMouseButton.Right,
+                            RequireFreeHand = true,
+                        }
+                    ];
+                }
+            }
+            else if (carriedInHands == null)
+            {
+                interactions = [
                     new WorldInteraction {
-                        ActionLangCode  = "carryon:blockhelp-put",
-                        HotKeyCode      = "carryonputkey",
+                        ActionLangCode  = "carryon:blockhelp-take",
+                        HotKeyCode      = "carryonpickupkey",
                         MouseButton     = EnumMouseButton.Right,
                         RequireFreeHand = true,
                     }
-                };
+                ];
             }
-
-            WorldInteraction[] interactions = [
-                new WorldInteraction {
-                    ActionLangCode  = "carryon:blockhelp-take",
-                    HotKeyCode      = "carryonpickupkey",
-                    MouseButton     = EnumMouseButton.Right,
-                    RequireFreeHand = true,
-                }
-            ];
 
             return interactions;
         }
