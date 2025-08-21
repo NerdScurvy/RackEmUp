@@ -314,7 +314,7 @@ namespace CarryOn.RackEmUp
         {
 
             // TODO: Implement CarryOnLib API to this info
-            var carriedInHands = CarryOnLib?.CarryManager?.GetCarriedBlock(forPlayer?.Entity, CarrySlot.Hands);
+            var carriedInHands = CarryOnLib?.CarryManager?.GetCarried(forPlayer?.Entity, CarrySlot.Hands);
 
             var moldRack = GetMoldRackBlockEntity(world, selection.Position);
             var slot = GetSlotFromMoldRack(moldRack, selection.SelectionBoxIndex);
