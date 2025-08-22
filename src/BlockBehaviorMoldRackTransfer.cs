@@ -31,7 +31,7 @@ namespace CarryOn.RackEmUp
         public override void Initialize(JsonObject properties)
         {
             base.Initialize(properties);
-             if (TryGetFloat(properties, "transferDelay", out var t)) TransferDelay = t;
+            if (TryGetFloat(properties, "transferDelay", out var t)) TransferDelay = t;
 
         }
 
