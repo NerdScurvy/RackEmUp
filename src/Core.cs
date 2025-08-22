@@ -12,7 +12,8 @@ using Vintagestory.API.Common;
 namespace CarryOn.RackEmUp
 {
     /// <summary> Main system for the "Carry On" mod, which allows certain
-    ///           blocks such as chests to be picked up and carried around. </summary>
+    /// <summary> Main system for the "RackEmUp" mod, which adds the capability
+    ///           to transfer carryable molds to and from the mold rack using the CarryOn API. </summary>
     public class Core : ModSystem
     { 
 
