@@ -232,7 +232,7 @@ namespace CarryOn.RackEmUp
             itemstack = null;
             blockEntityData = null;
 
-            if (!CanTakeCarryable(player, blockEntity, index, out _,out failureCode, out onScreenErrorMessage))
+            if (!CanTakeCarryable(player, blockEntity, index, out _, out failureCode, out onScreenErrorMessage))
             {
                 return false;
             }
