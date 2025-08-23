@@ -28,7 +28,7 @@ namespace CarryOn.RackEmUp
         public override void Initialize(JsonObject properties)
         {
             base.Initialize(properties);
-             if (TryGetFloat(properties, "transferDelay", out var t)) TransferDelay = t;
+            if (TryGetFloat(properties, "transferDelay", out var t)) TransferDelay = t;
 
         }
 
@@ -229,7 +229,7 @@ namespace CarryOn.RackEmUp
             itemstack = null;
             blockEntityData = null;
 
-            if (!CanTakeCarryable(player, blockEntity, index, out _,out failureCode, out onScreenErrorMessage))
+            if (!CanTakeCarryable(player, blockEntity, index, out _, out failureCode, out onScreenErrorMessage))
             {
                 return false;
             }
