@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		
+		<AssemblyTitle>RackEmUp</AssemblyTitle>
+		<Authors>NerdScurvy</Authors>
+		<Version>0.1.0-pre.1</Version>
+		
+		<Description>CarryOn extenstion to allow carried molds to be put or taken from the mold rack</Description>
+		<RepositoryUrl>https://github.com/NerdScurvy/RackEmUp</RepositoryUrl>
+		
+		<TargetFramework>net8.0</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		
+	</PropertyGroup>
+	<ItemGroup>
+		
+		<Reference Include="VintagestoryAPI">
+			<HintPath>$(VINTAGE_STORY)/VintagestoryAPI.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="VSEssentials">
+			<HintPath>$(VINTAGE_STORY)/Mods/VSEssentials.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="VSSurvivalMod">
+			<HintPath>$(VINTAGE_STORY)/Mods/VSSurvivalMod.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="protobuf-net">
+			<HintPath>$(VINTAGE_STORY)/Lib/protobuf-net.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="CarryOnLib">
+			<HintPath>..\CarryOnLib\bin\Debug\net8.0\CarryOnLib.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+
+	</ItemGroup>
+	
+	<ItemGroup Condition="'$(Configuration)' == 'Release'">
+		<None Include="UNLICENSE" CopyToOutputDirectory="PreserveNewest" />
+		<None Include="resources/**">
+			<Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+	
+	<Target Name="Package" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
+		<ZipDirectory DestinationFile="bin/$(TargetName).zip" SourceDirectory="$(TargetDir)" Overwrite="true" />
+		<Copy DestinationFolder="$(VINTAGE_STORY_DATA)/CarryOnDev/Mods/" SourceFiles="bin/$(TargetName).zip" />
+	</Target>
+</Project>

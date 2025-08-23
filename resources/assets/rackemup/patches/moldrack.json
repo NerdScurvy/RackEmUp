@@ -1,0 +1,19 @@
+[
+  {
+    "file": "game:blocktypes/wood/moldrack",
+    "side": "Server",
+    "op": "add",
+    "path": "/behaviors/-",
+    "value": {
+      "name": "MoldRackTransfer",
+      "properties": {
+        "transferDelay": 0.4
+      }
+    },
+    "condition": {
+      "when": "carryon:MoldRackTransferEnabled",
+      "isValue": "true"
+    }
+  }  
+]
+
