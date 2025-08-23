@@ -7,7 +7,8 @@ using Vintagestory.API.Common;
     Description = "Adds the capability to transfer carryable molds to and from the mold rack",
     Website = "https://github.com/NerdScurvy/RackEmUp",
     Authors = new[] { "NerdScurvy" })]
-[assembly: ModDependency("game", "1.21.0-rc.6")]
+[assembly: ModDependency("game", "1.21.0-rc.7")]
+[assembly: ModDependency("carryonlib", "1.0.0")]
 
 namespace CarryOn.RackEmUp
 {
@@ -15,6 +16,7 @@ namespace CarryOn.RackEmUp
     ///           blocks such as chests to be picked up and carried around. </summary>
     public class Core : ModSystem
     { 
+        public static string ModId => "rackemup";
 
         public ICarryManager CarryManager { get; set; }
         

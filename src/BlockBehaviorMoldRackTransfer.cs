@@ -6,16 +6,13 @@ using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.GameContent;
+using static CarryOn.API.Common.CarryCode;
+using static CarryOn.Utility.JsonHelper;
 
 namespace CarryOn.RackEmUp
 {
     public class BlockBehaviorMoldRackTransfer : BlockBehavior, ICarryableTransfer
     {
-
-        private const string ContinueFailureCode = "__continue__";
-        private const string StopFailureCode = "__stop__";
-        private const string DefaultFailureCode = "__default__";
-        private const string InternalFailureCode = "__failure__";
 
         public static string Name { get; } = "MoldRackTransfer";
 
@@ -89,7 +86,7 @@ namespace CarryOn.RackEmUp
 
             if (moldRack.Inventory[index]?.Empty == false)
             {
-                failureCode = StopFailureCode;
+                failureCode = FailureCode.Stop;
                 onScreenErrorMessage = Lang.Get("carryon:mold-rack-transfer-occupied", blockName);
                 return false;
             }
@@ -167,7 +164,7 @@ namespace CarryOn.RackEmUp
             {
                 // Item in slot is not carryable - skip further CarryOn interactions and allow default handling
                 // If the item in the slot is a shield then pick it up normally
-                failureCode = DefaultFailureCode;
+                failureCode = FailureCode.Default;
 
                 return false;
             }
@@ -197,7 +194,7 @@ namespace CarryOn.RackEmUp
             if (player.Entity.Api.Side == EnumAppSide.Client)
             {
                 // Prevent transfer on client side but tell to continue server side
-                failureCode = ContinueFailureCode;
+                failureCode = FailureCode.Continue;
                 return false;
             }
 
@@ -240,7 +237,7 @@ namespace CarryOn.RackEmUp
             if (player.Entity.Api.Side == EnumAppSide.Client)
             {
                 // Prevent transfer on client side but tell to continue server side
-                failureCode = ContinueFailureCode;
+                failureCode = FailureCode.Continue;
                 return false;
             }
 
@@ -278,7 +275,7 @@ namespace CarryOn.RackEmUp
                 return true;
             }
 
-            if (moldRack == null || selection.SelectionBoxIndex < 0 || selection.SelectionBoxIndex >= moldRack.Inventory.Count)
+            if (selection.SelectionBoxIndex < 0 || selection.SelectionBoxIndex >= moldRack.Inventory.Count)
             {
                 return true;
             }
@@ -333,8 +330,8 @@ namespace CarryOn.RackEmUp
                     // Slot is empty, allow putting items into it
                     return [
                         new WorldInteraction {
-                            ActionLangCode  = "carryon:blockhelp-put",
-                            HotKeyCode      = "carryonputkey",
+                            ActionLangCode  = CarryOnCode("blockhelp-put"),
+                            HotKeyCode      = HotKeyCode.Pickup,
                             MouseButton     = EnumMouseButton.Right,
                             RequireFreeHand = true,
                         }
@@ -345,8 +342,8 @@ namespace CarryOn.RackEmUp
             {
                 interactions = [
                     new WorldInteraction {
-                        ActionLangCode  = "carryon:blockhelp-take",
-                        HotKeyCode      = "carryonpickupkey",
+                        ActionLangCode  = CarryOnCode("blockhelp-take"),
+                        HotKeyCode      = HotKeyCode.Pickup,
                         MouseButton     = EnumMouseButton.Right,
                         RequireFreeHand = true,
                     }
@@ -355,17 +352,5 @@ namespace CarryOn.RackEmUp
 
             return interactions;
         }
-        
-        private bool TryGetFloat(JsonObject json, string key, out float result)
-        {
-            if (!json.KeyExists(key))
-            {
-                result = float.NaN;
-                return false;
-            }
-            result = json[key].AsFloat(float.NaN);
-            return !float.IsNaN(result);
-        }
-
     }
 }
