@@ -9,10 +9,6 @@
       "properties": {
         "transferDelay": 0.4
       }
-    },
-    "condition": {
-      "when": "carryon:MoldRackTransferEnabled",
-      "isValue": "true"
     }
   }  
 ]
