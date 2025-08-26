@@ -7,7 +7,7 @@ using Vintagestory.API.Common;
     Description = "Adds the capability to transfer carryable molds to and from the mold rack",
     Website = "https://github.com/NerdScurvy/RackEmUp",
     Authors = new[] { "NerdScurvy" })]
-[assembly: ModDependency("game", "1.21.0-rc.7")]
+[assembly: ModDependency("game", "1.21.0")]
 [assembly: ModDependency("carryonlib", "1.0.0")]
 
 namespace CarryOn.RackEmUp
