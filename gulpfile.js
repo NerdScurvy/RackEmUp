@@ -95,24 +95,25 @@ function renameZip() {
         if( !fs.existsSync(`${sourcePath}/${oldName}`)) {
             console.log(`Release has not been built yet, skipping rename.`);
             return resolve();
-        }        
+        }
         fs.mkdir(destinationPath, { recursive: true }, (err) => {
             if (err) {
                 console.error(`Error creating release directory: ${err.message}`);
                 return reject(err);
             }
-        });        
-        if( fs.existsSync(`${destinationPath}/${newName}`)) {
-            console.log(`Release file already exists: ${newName}`);
-            return reject(new Error(`Release file already exists: ${newName}`));
-        }
-        fs.rename(`${sourcePath}/${oldName}`, `./release/${newName}`, (err) => {
-            if (err) {
-                console.error(`Error renaming zip file: ${err.message}`);
-                return reject(err);
+            // Now that the directory exists, continue with the rest of the logic
+            if( fs.existsSync(`${destinationPath}/${newName}`)) {
+                console.log(`Release file already exists: ${newName}`);
+                return reject(new Error(`Release file already exists: ${newName}`));
             }
-            console.log(`Renamed ${oldName} to ${newName} and moved to release folder`);
-            resolve();
+            fs.rename(`${sourcePath}/${oldName}`, `./release/${newName}`, (err) => {
+                if (err) {
+                    console.error(`Error renaming zip file: ${err.message}`);
+                    return reject(err);
+                }
+                console.log(`Renamed ${oldName} to ${newName} and moved to release folder`);
+                resolve();
+            });
         });
     });
 }
