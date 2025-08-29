@@ -1,4 +1,4 @@
-using CarryOn.API.Common;
+using CarryOn.API.Common.Interfaces;
 using Vintagestory.API.Common;
 
 [assembly: ModInfo("CarryOn RackEmUp",
