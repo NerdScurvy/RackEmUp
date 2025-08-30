@@ -1,12 +1,13 @@
 using System.Linq;
-using CarryOn.API.Common;
+using CarryOn.API.Common.Interfaces;
+using CarryOn.API.Common.Models;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.GameContent;
-using static CarryOn.API.Common.CarryCode;
+using static CarryOn.API.Common.Models.CarryCode;
 using static CarryOn.Utility.JsonHelper;
 
 namespace CarryOn.RackEmUp
