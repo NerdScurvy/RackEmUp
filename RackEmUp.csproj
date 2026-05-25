@@ -37,7 +37,7 @@
 		<Reference Include="CarryOnLib" Condition="'$(Configuration)' == 'Release'">
 			<HintPath>..\CarryOnLib\bin\Release\net10.0\CarryOnLib.dll</HintPath>
 			<Private>false</Private>
-		</Reference>
+		</Reference>	
 
 	</ItemGroup>
 	
