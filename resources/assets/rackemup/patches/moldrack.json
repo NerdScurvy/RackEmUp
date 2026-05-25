@@ -10,6 +10,20 @@
         "transferDelay": 0.4
       }
     }
-  }  
+  },
+  {
+    "file": "game:blocktypes/wood/moldrack",
+    "side": "Server",
+    "op": "add",
+    "path": "/behaviors/-",
+    "value": {
+      "name": "Carryable",
+      "properties": {
+        "priority": 10,
+        "overrideExistingProperties": true,
+        "forcePickupOnSwapBack": true
+      }
+    }
+  } 
 ]
 
