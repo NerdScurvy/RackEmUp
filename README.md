@@ -15,7 +15,7 @@ RackEmUp is a mod for Vintage Story that adds advanced mold rack management and 
 
 ## Compatibility
 
-- Requires Vintage Story 1.21 or newer.
+- Requires Vintage Story 1.22 or newer.
 
 ## Dependencies
 - CarryOnLib
