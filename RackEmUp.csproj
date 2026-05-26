@@ -8,7 +8,7 @@
 		<Description>CarryOn extension to allow carried molds to be put or taken from the mold rack</Description>
 		<RepositoryUrl>https://github.com/NerdScurvy/RackEmUp</RepositoryUrl>
 		
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		
 	</PropertyGroup>
@@ -31,13 +31,13 @@
 			<Private>false</Private>
 		</Reference>
 		<Reference Include="CarryOnLib" Condition="'$(Configuration)' == 'Debug'">
-			<HintPath>..\CarryOnLib\bin\Debug\net8.0\CarryOnLib.dll</HintPath>
+			<HintPath>..\CarryOnLib\bin\Debug\net10.0\CarryOnLib.dll</HintPath>
 			<Private>false</Private>
 		</Reference>	
 		<Reference Include="CarryOnLib" Condition="'$(Configuration)' == 'Release'">
-			<HintPath>..\CarryOnLib\bin\Release\net8.0\CarryOnLib.dll</HintPath>
+			<HintPath>..\CarryOnLib\bin\Release\net10.0\CarryOnLib.dll</HintPath>
 			<Private>false</Private>
-		</Reference>
+		</Reference>	
 
 	</ItemGroup>
 	

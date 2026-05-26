@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using CarryOn.API.Common.Interfaces;
 using CarryOn.API.Common.Models;
@@ -12,10 +13,13 @@ using static CarryOn.Utility.JsonHelper;
 
 namespace CarryOn.RackEmUp
 {
-    public class BlockBehaviorMoldRackTransfer : BlockBehavior, ICarryableTransfer
+    public class BlockBehaviorMoldRackTransfer : BlockBehavior, ICarryableTransfer, ICarryableHintPolicy
     {
 
         public static string Name { get; } = "MoldRackTransfer";
+
+        private static ItemStack[] putStacks;
+        private static ItemStack[] takeStacks;
 
         public BlockBehaviorMoldRackTransfer(Block block) : base(block)
         {
@@ -88,7 +92,7 @@ namespace CarryOn.RackEmUp
             if (moldRack.Inventory[index]?.Empty == false)
             {
                 failureCode = FailureCode.Stop;
-                onScreenErrorMessage = Lang.Get("carryon:mold-rack-transfer-occupied", blockName);
+                onScreenErrorMessage = Lang.Get("rackemup:mold-rack-transfer-occupied", blockName);
                 return false;
             }
 
@@ -97,7 +101,7 @@ namespace CarryOn.RackEmUp
             if (!moldRackable)
             {
                 failureCode = "mold-rack-transfer-incompatible";
-                onScreenErrorMessage = Lang.Get($"carryon:{failureCode}", blockName);
+                onScreenErrorMessage = Lang.Get($"rackemup:{failureCode}", blockName);
                 return false;
             }
 
@@ -108,7 +112,7 @@ namespace CarryOn.RackEmUp
                 if (blockEntityData.GetAsBool("shattered", false))
                 {
                     failureCode = "mold-rack-transfer-shattered";
-                    onScreenErrorMessage = Lang.Get($"carryon:{failureCode}", blockName);
+                    onScreenErrorMessage = Lang.Get($"rackemup:{failureCode}", blockName);
                     return false;
                 }
 
@@ -116,7 +120,7 @@ namespace CarryOn.RackEmUp
                 if (blockEntityData.GetAsInt("fillLevel", -1) > 0)
                 {
                     failureCode = "mold-rack-transfer-nonempty";
-                    onScreenErrorMessage = Lang.Get($"carryon:{failureCode}", blockName);
+                    onScreenErrorMessage = Lang.Get($"rackemup:{failureCode}", blockName);
                     return false;
                 }
             }
@@ -305,6 +309,73 @@ namespace CarryOn.RackEmUp
             return block?.BlockBehaviors?.Any(b => b.GetType().Name == behaviorClassName) ?? false;
         }
 
+        public CarryHintType GetAllowedHints(CarryHintContext context, CarryHintType defaultHints)
+        {
+            var allowedHints = defaultHints;
+
+            var selection = context?.Selection;
+            var world = context?.Player?.Entity?.Api?.World;
+            var pos = selection?.Position;
+            if (world == null || pos == null)
+            {
+                return allowedHints;
+            }
+
+            var moldRack = GetMoldRackBlockEntity(world, pos);
+            int selectionBoxIndex = context?.SelectionBoxIndex ?? selection.SelectionBoxIndex;
+            var slot = GetSlotFromMoldRack(moldRack, selectionBoxIndex);
+            if (slot == null)
+            {
+                return allowedHints;
+            }
+
+            bool isCarryingInHands = context.IsCarryingInHands;
+
+            // Only show put hint when there is carried content and selected slot is empty.
+            if (slot.Empty)
+            {
+                allowedHints &= ~CarryHintType.TransferTake;
+                if (!isCarryingInHands)
+                {
+                    allowedHints &= ~CarryHintType.TransferPut;
+                }
+            }
+            else
+            {
+                allowedHints &= ~CarryHintType.TransferPut;
+                if (isCarryingInHands)
+                {
+                    allowedHints &= ~CarryHintType.TransferTake;
+                }
+            }
+
+            // Control pickup hints based on slot content:
+            // - When slot has an item: show force-pickup only (swap-back to replace it)
+            // - When slot is empty: show base-pickup only (normal pickup)
+            // - When carrying something: hide all pickup hints
+            if (isCarryingInHands)
+            {
+                allowedHints &= ~(CarryHintType.BasePickup | CarryHintType.ForcePickup);
+            }
+            else if (!slot.Empty)
+            {
+                // Slot has an item: show force-pickup (swap-back), hide base-pickup
+                allowedHints &= ~CarryHintType.BasePickup;
+            }
+            else
+            {
+                // Slot is empty: show base-pickup, hide force-pickup
+                allowedHints &= ~CarryHintType.ForcePickup;
+            }
+
+            if (!context.IsTargetCarryable)
+            {
+                allowedHints &= ~(CarryHintType.BasePickup | CarryHintType.ForcePickup);
+            }
+
+            return allowedHints;
+        }
+
 
 
         public override WorldInteraction[] GetPlacedBlockInteractionHelp(
@@ -319,39 +390,69 @@ namespace CarryOn.RackEmUp
 
             if (moldRack == null || slot == null)
             {
-                return null; // Not a mold rack or invalid selection
+                return []; // Not a mold rack or invalid selection
             }
 
-            WorldInteraction[] interactions = null;
+            var interactions = new List<WorldInteraction>();
 
-            if (slot.Empty)
+            putStacks ??= [new ItemStack(world.GetItem(new AssetLocation("carryon:icon-put")))];
+
+            takeStacks ??= [new ItemStack(world.GetItem(new AssetLocation("carryon:icon-take")))];
+
+            var defaultHints = CarryHintType.None;
+            if (slot.Empty && carriedInHands != null)
             {
-                if (carriedInHands != null)
-                {
-                    // Slot is empty, allow putting items into it
-                    return [
-                        new WorldInteraction {
-                            ActionLangCode  = CarryOnCode("blockhelp-put"),
-                            HotKeyCode      = HotKeyCode.Pickup,
-                            MouseButton     = EnumMouseButton.Right,
-                            RequireFreeHand = true,
-                        }
-                    ];
-                }
+                defaultHints |= CarryHintType.TransferPut;
             }
-            else if (carriedInHands == null)
+            else if (!slot.Empty && carriedInHands == null)
             {
-                interactions = [
+                defaultHints |= CarryHintType.TransferTake;
+            }
+
+            ItemStack rackStack = selection?.Block?.OnPickBlock(world, selection.Position);
+            bool canCarryRack = selection?.Block != null && HasBehavior(selection.Block, "BlockBehaviorCarryable") && rackStack != null;
+
+            var hintContext = new CarryHintContext {
+                Player = forPlayer,
+                Selection = selection,
+                BlockEntity = moldRack,
+                SelectionBoxIndex = selection.SelectionBoxIndex,
+                IsTargetCarryable = canCarryRack,
+                IsCarryingInHands = carriedInHands != null,
+                IsTargetSlotEmpty = slot.Empty,
+                CanTransferPut = slot.Empty && carriedInHands != null,
+                CanTransferTake = !slot.Empty && carriedInHands == null
+            };
+
+            var allowedHints = GetAllowedHints(hintContext, defaultHints) & defaultHints;
+
+            if ((allowedHints & CarryHintType.TransferPut) != 0)
+            {
+                interactions.Add(
+                    new WorldInteraction {
+                        ActionLangCode  = CarryOnCode("blockhelp-put"),
+                        HotKeyCode      = HotKeyCode.Pickup,
+                        MouseButton     = EnumMouseButton.Right,
+                        RequireFreeHand = true,
+                        Itemstacks      = putStacks
+                    }
+                );
+            }
+
+            if ((allowedHints & CarryHintType.TransferTake) != 0)
+            {
+                interactions.Add(
                     new WorldInteraction {
                         ActionLangCode  = CarryOnCode("blockhelp-take"),
                         HotKeyCode      = HotKeyCode.Pickup,
                         MouseButton     = EnumMouseButton.Right,
                         RequireFreeHand = true,
+                        Itemstacks      = takeStacks
                     }
-                ];
+                );
             }
 
-            return interactions;
+            return interactions.Count > 0 ? [.. interactions] : [];
         }
     }
 }
