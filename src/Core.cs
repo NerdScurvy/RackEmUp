@@ -1,4 +1,5 @@
 using CarryOn.API.Common.Interfaces;
+using CarryOn.CarryOnLib;
 using Vintagestory.API.Common;
 
 [assembly: ModInfo("CarryOn RackEmUp",
@@ -23,7 +24,7 @@ namespace CarryOn.RackEmUp
         
         public override void Start(ICoreAPI api)
         {
-            var carryOnLib = api.ModLoader.GetModSystem<CarryOnLib.Core>();
+            var carryOnLib = api.ModLoader.GetModSystem<CarryOnLibSystem>();
             CarryManager = carryOnLib.CarryManager;
 
             api.RegisterBlockBehaviorClass(BlockBehaviorMoldRackTransfer.Name, typeof(BlockBehaviorMoldRackTransfer));
