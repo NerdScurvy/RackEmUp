@@ -2,13 +2,13 @@ using System.Collections.Generic;
 using System.Linq;
 using CarryOn.API.Common.Interfaces;
 using CarryOn.API.Common.Models;
+using static CarryOn.API.Common.Models.CarryConstant;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.GameContent;
-using static CarryOn.API.Common.Models.CarryCode;
 using static CarryOn.Utility.JsonHelper;
 
 namespace CarryOn.RackEmUp
@@ -395,9 +395,9 @@ namespace CarryOn.RackEmUp
 
             var interactions = new List<WorldInteraction>();
 
-            putStacks ??= [new ItemStack(world.GetItem(new AssetLocation("carryon:icon-put")))];
+            putStacks ??= [new ItemStack(world.GetItem(new AssetLocation(CarryOnCode("icon-put"))))];
 
-            takeStacks ??= [new ItemStack(world.GetItem(new AssetLocation("carryon:icon-take")))];
+            takeStacks ??= [new ItemStack(world.GetItem(new AssetLocation(CarryOnCode("icon-take"))))];
 
             var defaultHints = CarryHintType.None;
             if (slot.Empty && carriedInHands != null)
