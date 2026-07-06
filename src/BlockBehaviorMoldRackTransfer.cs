@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CarryOn.API.Common.Interfaces;
 using CarryOn.API.Common.Models;
+using static CarryOn.API.Common.Models.CarryConstant;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
@@ -16,11 +17,6 @@ namespace CarryOn.RackEmUp
     {
 
         public static string Name { get; } = "MoldRackTransfer";
-
-        private const string FailureCodeStop = "__stop__";
-        private const string FailureCodeDefault = "__default__";
-        private const string FailureCodeContinue = "__continue__";
-        private const string HotKeyCodePickup = "carryonpickupkey";
 
         private static ItemStack[] putStacks;
         private static ItemStack[] takeStacks;
@@ -95,7 +91,7 @@ namespace CarryOn.RackEmUp
 
             if (moldRack.Inventory[index]?.Empty == false)
             {
-                failureCode = FailureCodeStop;
+                failureCode = FailureCode.Stop;
                 onScreenErrorMessage = Lang.Get("rackemup:mold-rack-transfer-occupied", blockName);
                 return false;
             }
@@ -173,7 +169,7 @@ namespace CarryOn.RackEmUp
             {
                 // Item in slot is not carryable - skip further CarryOn interactions and allow default handling
                 // If the item in the slot is a shield then pick it up normally
-                failureCode = FailureCodeDefault;
+                failureCode = FailureCode.Default;
 
                 return false;
             }
@@ -203,7 +199,7 @@ namespace CarryOn.RackEmUp
             if (player.Entity.Api.Side == EnumAppSide.Client)
             {
                 // Prevent transfer on client side but tell to continue server side
-                failureCode = FailureCodeContinue;
+                failureCode = FailureCode.Continue;
                 return false;
             }
 
@@ -246,7 +242,7 @@ namespace CarryOn.RackEmUp
             if (player.Entity.Api.Side == EnumAppSide.Client)
             {
                 // Prevent transfer on client side but tell to continue server side
-                failureCode = FailureCodeContinue;
+                failureCode = FailureCode.Continue;
                 return false;
             }
 
@@ -399,9 +395,9 @@ namespace CarryOn.RackEmUp
 
             var interactions = new List<WorldInteraction>();
 
-            putStacks ??= [new ItemStack(world.GetItem(new AssetLocation("carryon:icon-put")))];
+            putStacks ??= [new ItemStack(world.GetItem(new AssetLocation(CarryOnCode("icon-put"))))];
 
-            takeStacks ??= [new ItemStack(world.GetItem(new AssetLocation("carryon:icon-take")))];
+            takeStacks ??= [new ItemStack(world.GetItem(new AssetLocation(CarryOnCode("icon-take"))))];
 
             var defaultHints = CarryHintType.None;
             if (slot.Empty && carriedInHands != null)
@@ -434,8 +430,8 @@ namespace CarryOn.RackEmUp
             {
                 interactions.Add(
                     new WorldInteraction {
-                        ActionLangCode  = "carryon:blockhelp-put",
-                        HotKeyCode      = HotKeyCodePickup,
+                        ActionLangCode  = CarryOnCode("blockhelp-put"),
+                        HotKeyCode      = HotKeyCode.Pickup,
                         MouseButton     = EnumMouseButton.Right,
                         RequireFreeHand = true,
                         Itemstacks      = putStacks
@@ -447,8 +443,8 @@ namespace CarryOn.RackEmUp
             {
                 interactions.Add(
                     new WorldInteraction {
-                        ActionLangCode  = "carryon:blockhelp-take",
-                        HotKeyCode      = HotKeyCodePickup,
+                        ActionLangCode  = CarryOnCode("blockhelp-take"),
+                        HotKeyCode      = HotKeyCode.Pickup,
                         MouseButton     = EnumMouseButton.Right,
                         RequireFreeHand = true,
                         Itemstacks      = takeStacks
