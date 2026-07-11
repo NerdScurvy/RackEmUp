@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CarryOn.API.Common.Interfaces;
 using CarryOn.API.Common.Models;
-using static CarryOn.API.Common.Models.CarryConstant;
+using static CarryOn.API.Common.Models.CarryConstants;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
@@ -24,7 +24,7 @@ namespace CarryOn.RackEmUp
         {
         }
 
-        public ICarryManager? CarryManager { get; set; }
+        public ICarryManager CarryManager { get; set; }
 
         // Could implement a per-slot index delay
         private float? TransferDelay { get; set; }
@@ -394,9 +394,9 @@ namespace CarryOn.RackEmUp
 
             var interactions = new List<WorldInteraction>();
 
-            putStacks ??= [new ItemStack(world.GetItem(new AssetLocation(CarryOnCode("icon-put"))))];
+            putStacks ??= [new ItemStack(world.GetItem(new AssetLocation(GetCarryCode("icon-put"))))];
 
-            takeStacks ??= [new ItemStack(world.GetItem(new AssetLocation(CarryOnCode("icon-take"))))];
+            takeStacks ??= [new ItemStack(world.GetItem(new AssetLocation(GetCarryCode("icon-take"))))];
 
             var defaultHints = CarryHintType.None;
             if (slot.Empty && carriedInHands != null)
@@ -429,7 +429,7 @@ namespace CarryOn.RackEmUp
             {
                 interactions.Add(
                     new WorldInteraction {
-                        ActionLangCode  = CarryOnCode("blockhelp-put"),
+                        ActionLangCode  = GetCarryCode("blockhelp-put"),
                         HotKeyCode      = HotKeyCode.Pickup,
                         MouseButton     = EnumMouseButton.Right,
                         RequireFreeHand = true,
@@ -442,7 +442,7 @@ namespace CarryOn.RackEmUp
             {
                 interactions.Add(
                     new WorldInteraction {
-                        ActionLangCode  = CarryOnCode("blockhelp-take"),
+                        ActionLangCode  = GetCarryCode("blockhelp-take"),
                         HotKeyCode      = HotKeyCode.Pickup,
                         MouseButton     = EnumMouseButton.Right,
                         RequireFreeHand = true,
