@@ -90,7 +90,7 @@ namespace CarryOn.RackEmUp
 
             if (moldRack.Inventory[index]?.Empty == false)
             {
-                failureCode = FailureCode.Stop;
+                failureCode = FailureCodes.Stop;
                 onScreenErrorMessage = Lang.Get("rackemup:mold-rack-transfer-occupied", blockName);
                 return false;
             }
@@ -168,7 +168,7 @@ namespace CarryOn.RackEmUp
             {
                 // Item in slot is not carryable - skip further CarryOn interactions and allow default handling
                 // If the item in the slot is a shield then pick it up normally
-                failureCode = FailureCode.Default;
+                failureCode = FailureCodes.Default;
 
                 return false;
             }
@@ -198,7 +198,7 @@ namespace CarryOn.RackEmUp
             if (player.Entity.Api.Side == EnumAppSide.Client)
             {
                 // Prevent transfer on client side but tell to continue server side
-                failureCode = FailureCode.Continue;
+                failureCode = FailureCodes.Continue;
                 return false;
             }
 
@@ -241,7 +241,7 @@ namespace CarryOn.RackEmUp
             if (player.Entity.Api.Side == EnumAppSide.Client)
             {
                 // Prevent transfer on client side but tell to continue server side
-                failureCode = FailureCode.Continue;
+                failureCode = FailureCodes.Continue;
                 return false;
             }
 
@@ -430,7 +430,7 @@ namespace CarryOn.RackEmUp
                 interactions.Add(
                     new WorldInteraction {
                         ActionLangCode  = GetCarryCode("blockhelp-put"),
-                        HotKeyCode      = HotKeyCode.Pickup,
+                        HotKeyCode      = HotKeyCodes.Pickup,
                         MouseButton     = EnumMouseButton.Right,
                         RequireFreeHand = true,
                         Itemstacks      = putStacks
@@ -443,7 +443,7 @@ namespace CarryOn.RackEmUp
                 interactions.Add(
                     new WorldInteraction {
                         ActionLangCode  = GetCarryCode("blockhelp-take"),
-                        HotKeyCode      = HotKeyCode.Pickup,
+                        HotKeyCode      = HotKeyCodes.Pickup,
                         MouseButton     = EnumMouseButton.Right,
                         RequireFreeHand = true,
                         Itemstacks      = takeStacks
