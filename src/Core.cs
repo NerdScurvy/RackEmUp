@@ -24,11 +24,14 @@ namespace CarryOn.RackEmUp
         
         public override void Start(ICoreAPI api)
         {
+            api.RegisterBlockBehaviorClass(BlockBehaviorMoldRackTransfer.Name, typeof(BlockBehaviorMoldRackTransfer));
+        }
+
+        public override void AssetsLoaded(ICoreAPI api)
+        {
             var carryOnLib = api.ModLoader.GetModSystem<CarryOnLibSystem>();
             CarryManager = carryOnLib.CarryManager;
-
-            api.RegisterBlockBehaviorClass(BlockBehaviorMoldRackTransfer.Name, typeof(BlockBehaviorMoldRackTransfer));
-
+            CarryManager?.RegisterTransferBehavior(ModId, BlockBehaviorMoldRackTransfer.Name);
         }
     }
 }
