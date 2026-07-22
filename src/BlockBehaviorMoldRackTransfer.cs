@@ -2,13 +2,13 @@ using System.Collections.Generic;
 using System.Linq;
 using CarryOn.API.Common.Interfaces;
 using CarryOn.API.Common.Models;
+using static CarryOn.API.Common.Models.CarryConstants;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.GameContent;
-using static CarryOn.API.Common.Models.CarryCode;
 using static CarryOn.Utility.JsonHelper;
 
 namespace CarryOn.RackEmUp
@@ -25,7 +25,9 @@ namespace CarryOn.RackEmUp
         {
         }
 
-        public CarryOnLib.Core CarryOnLib { get; set; }
+        private ICoreAPI api;
+
+        private ICarryManager CarryManager => this.api?.ModLoader.GetModSystem<Core>()?.CarryManager;
 
         // Could implement a per-slot index delay
         private float? TransferDelay { get; set; }
@@ -39,7 +41,7 @@ namespace CarryOn.RackEmUp
 
         public override void OnLoaded(ICoreAPI api)
         {
-            CarryOnLib = api.ModLoader.GetModSystem<CarryOnLib.Core>();
+            this.api = api;
 
             base.OnLoaded(api);
         }
@@ -91,7 +93,7 @@ namespace CarryOn.RackEmUp
 
             if (moldRack.Inventory[index]?.Empty == false)
             {
-                failureCode = FailureCode.Stop;
+                failureCode = FailureCodes.Stop;
                 onScreenErrorMessage = Lang.Get("rackemup:mold-rack-transfer-occupied", blockName);
                 return false;
             }
@@ -169,7 +171,7 @@ namespace CarryOn.RackEmUp
             {
                 // Item in slot is not carryable - skip further CarryOn interactions and allow default handling
                 // If the item in the slot is a shield then pick it up normally
-                failureCode = FailureCode.Default;
+                failureCode = FailureCodes.Default;
 
                 return false;
             }
@@ -199,7 +201,7 @@ namespace CarryOn.RackEmUp
             if (player.Entity.Api.Side == EnumAppSide.Client)
             {
                 // Prevent transfer on client side but tell to continue server side
-                failureCode = FailureCode.Continue;
+                failureCode = FailureCodes.Continue;
                 return false;
             }
 
@@ -242,7 +244,7 @@ namespace CarryOn.RackEmUp
             if (player.Entity.Api.Side == EnumAppSide.Client)
             {
                 // Prevent transfer on client side but tell to continue server side
-                failureCode = FailureCode.Continue;
+                failureCode = FailureCodes.Continue;
                 return false;
             }
 
@@ -382,8 +384,7 @@ namespace CarryOn.RackEmUp
                     IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, ref EnumHandling handled)
         {
 
-            // TODO: Implement CarryOnLib API to this info
-            var carriedInHands = CarryOnLib?.CarryManager?.GetCarried(forPlayer?.Entity, CarrySlot.Hands);
+            var carriedInHands = CarryManager?.GetCarried(forPlayer?.Entity, CarrySlot.Hands);
 
             var moldRack = GetMoldRackBlockEntity(world, selection.Position);
             var slot = GetSlotFromMoldRack(moldRack, selection.SelectionBoxIndex);
@@ -395,9 +396,9 @@ namespace CarryOn.RackEmUp
 
             var interactions = new List<WorldInteraction>();
 
-            putStacks ??= [new ItemStack(world.GetItem(new AssetLocation("carryon:icon-put")))];
+            putStacks ??= [new ItemStack(world.GetItem(new AssetLocation(GetCarryCode("icon-put"))))];
 
-            takeStacks ??= [new ItemStack(world.GetItem(new AssetLocation("carryon:icon-take")))];
+            takeStacks ??= [new ItemStack(world.GetItem(new AssetLocation(GetCarryCode("icon-take"))))];
 
             var defaultHints = CarryHintType.None;
             if (slot.Empty && carriedInHands != null)
@@ -430,8 +431,8 @@ namespace CarryOn.RackEmUp
             {
                 interactions.Add(
                     new WorldInteraction {
-                        ActionLangCode  = CarryOnCode("blockhelp-put"),
-                        HotKeyCode      = HotKeyCode.Pickup,
+                        ActionLangCode  = GetCarryCode("blockhelp-put"),
+                        HotKeyCode      = HotKeyCodes.Pickup,
                         MouseButton     = EnumMouseButton.Right,
                         RequireFreeHand = true,
                         Itemstacks      = putStacks
@@ -443,8 +444,8 @@ namespace CarryOn.RackEmUp
             {
                 interactions.Add(
                     new WorldInteraction {
-                        ActionLangCode  = CarryOnCode("blockhelp-take"),
-                        HotKeyCode      = HotKeyCode.Pickup,
+                        ActionLangCode  = GetCarryCode("blockhelp-take"),
+                        HotKeyCode      = HotKeyCodes.Pickup,
                         MouseButton     = EnumMouseButton.Right,
                         RequireFreeHand = true,
                         Itemstacks      = takeStacks
