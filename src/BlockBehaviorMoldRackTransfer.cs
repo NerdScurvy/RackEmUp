@@ -10,6 +10,7 @@ using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.GameContent;
 using static CarryOn.Utility.JsonHelper;
+
 namespace CarryOn.RackEmUp
 {
     public class BlockBehaviorMoldRackTransfer : BlockBehavior, ICarryableTransfer, ICarryableHintPolicy
@@ -24,7 +25,9 @@ namespace CarryOn.RackEmUp
         {
         }
 
-        public ICarryManager CarryManager { get; set; }
+        private ICoreAPI api;
+
+        private ICarryManager CarryManager => this.api?.ModLoader.GetModSystem<Core>()?.CarryManager;
 
         // Could implement a per-slot index delay
         private float? TransferDelay { get; set; }
@@ -38,7 +41,7 @@ namespace CarryOn.RackEmUp
 
         public override void OnLoaded(ICoreAPI api)
         {
-            CarryManager = api.ModLoader.GetModSystem<Core>()?.CarryManager;
+            this.api = api;
 
             base.OnLoaded(api);
         }
@@ -381,7 +384,6 @@ namespace CarryOn.RackEmUp
                     IWorldAccessor world, BlockSelection selection, IPlayer forPlayer, ref EnumHandling handled)
         {
 
-            // TODO: Implement CarryOnLib API to this info
             var carriedInHands = CarryManager?.GetCarried(forPlayer?.Entity, CarrySlot.Hands);
 
             var moldRack = GetMoldRackBlockEntity(world, selection.Position);
