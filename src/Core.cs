@@ -9,7 +9,7 @@ using Vintagestory.API.Common;
     Website = "https://github.com/NerdScurvy/RackEmUp",
     Authors = new[] { "NerdScurvy" })]
 [assembly: ModDependency("game", "1.22.0")]
-[assembly: ModDependency("carryonlib", "1.0.0-pre.1")]
+[assembly: ModDependency("carryonlib", "1.0.0-pre.8")]
 
 namespace CarryOn.RackEmUp
 {
